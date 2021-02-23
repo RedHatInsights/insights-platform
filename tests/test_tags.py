@@ -70,22 +70,20 @@ def test_get_filtered_by_search_tags_of_multiple_hosts(mq_create_four_specific_h
             "",
             {
                 created_hosts[0].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS1", "key": "key2", "value": "val1"},
-                    {"namespace": "SPECIAL", "key": "tag", "value": "ToFind"},
-                    {"namespace": "no", "key": "key", "value": None},
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key2", "value": "val1"},
+                    {"namespace": "insights-client", "key": "tag", "value": "ToFind"},
+                    {"namespace": "insights-client", "key": "key", "value": None},
                 ],
                 created_hosts[1].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS2", "key": "key2", "value": "val2"},
-                    {"namespace": "NS3", "key": "key3", "value": "val3"},
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                    {"namespace": "insights-client", "key": "key3", "value": "val3"},
                 ],
                 created_hosts[2].id: [
-                    {"namespace": "NS2", "key": "key2", "value": "val2"},
-                    {"namespace": "NS3", "key": "key3", "value": "val3"},
-                    {"namespace": "NS1", "key": "key3", "value": "val3"},
-                    {"namespace": None, "key": "key4", "value": "val4"},
-                    {"namespace": None, "key": "key5", "value": None},
+                    {"namespace": "insights-client", "key": "key2", "value": "val2"},
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                    {"namespace": "satellite", "key": "key5", "value": "val5"},
                 ],
                 created_hosts[3].id: [],
             },
@@ -93,29 +91,35 @@ def test_get_filtered_by_search_tags_of_multiple_hosts(mq_create_four_specific_h
         (
             "To",
             {
-                created_hosts[0].id: [{"namespace": "SPECIAL", "key": "tag", "value": "ToFind"}],
+                created_hosts[0].id: [{"namespace": "insights-client", "key": "tag", "value": "ToFind"}],
                 created_hosts[1].id: [],
                 created_hosts[2].id: [],
                 created_hosts[3].id: [],
             },
         ),
         (
-            "NS1",
+            "satellite",
             {
                 created_hosts[0].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS1", "key": "key2", "value": "val1"},
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key2", "value": "val1"},
                 ],
-                created_hosts[1].id: [{"namespace": "NS1", "key": "key1", "value": "val1"}],
-                created_hosts[2].id: [{"namespace": "NS1", "key": "key3", "value": "val3"}],
+                created_hosts[1].id: [
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                ],
+                created_hosts[2].id: [
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                    {"namespace": "satellite", "key": "key5", "value": "val5"},
+                ],
                 created_hosts[3].id: [],
             },
         ),
         (
             "key1",
             {
-                created_hosts[0].id: [{"namespace": "NS1", "key": "key1", "value": "val1"}],
-                created_hosts[1].id: [{"namespace": "NS1", "key": "key1", "value": "val1"}],
+                created_hosts[0].id: [{"namespace": "satellite", "key": "key1", "value": "val1"}],
+                created_hosts[1].id: [{"namespace": "satellite", "key": "key1", "value": "val1"}],
                 created_hosts[2].id: [],
                 created_hosts[3].id: [],
             },
@@ -124,10 +128,10 @@ def test_get_filtered_by_search_tags_of_multiple_hosts(mq_create_four_specific_h
             "val1",
             {
                 created_hosts[0].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS1", "key": "key2", "value": "val1"},
+                    {"namespace": "ns1", "key": "key1", "value": "val1"},
+                    {"namespace": "ns1", "key": "key2", "value": "val1"},
                 ],
-                created_hosts[1].id: [{"namespace": "NS1", "key": "key1", "value": "val1"}],
+                created_hosts[1].id: [{"namespace": "ns1", "key": "key1", "value": "val1"}],
                 created_hosts[2].id: [],
                 created_hosts[3].id: [],
             },
@@ -136,21 +140,20 @@ def test_get_filtered_by_search_tags_of_multiple_hosts(mq_create_four_specific_h
             "e",
             {
                 created_hosts[0].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS1", "key": "key2", "value": "val1"},
-                    {"namespace": "no", "key": "key", "value": None},
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key2", "value": "val1"},
+                    {"namespace": "insights-client", "key": "tag", "value": "ToFind"},
+                    {"namespace": "insights-client", "key": "key", "value": None},
                 ],
                 created_hosts[1].id: [
-                    {"namespace": "NS1", "key": "key1", "value": "val1"},
-                    {"namespace": "NS2", "key": "key2", "value": "val2"},
-                    {"namespace": "NS3", "key": "key3", "value": "val3"},
+                    {"namespace": "satellite", "key": "key1", "value": "val1"},
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                    {"namespace": "insights-client", "key": "key3", "value": "val3"},
                 ],
                 created_hosts[2].id: [
-                    {"namespace": "NS2", "key": "key2", "value": "val2"},
-                    {"namespace": "NS3", "key": "key3", "value": "val3"},
-                    {"namespace": "NS1", "key": "key3", "value": "val3"},
-                    {"namespace": None, "key": "key4", "value": "val4"},
-                    {"namespace": None, "key": "key5", "value": None},
+                    {"namespace": "insights-client", "key": "key2", "value": "val2"},
+                    {"namespace": "satellite", "key": "key3", "value": "val3"},
+                    {"namespace": "satellite", "key": "key5", "value": "val5"},
                 ],
                 created_hosts[3].id: [],
             },
@@ -164,6 +167,7 @@ def test_get_filtered_by_search_tags_of_multiple_hosts(mq_create_four_specific_h
             assert response_status == 200
             assert len(results.keys()) == len(response_data["results"].keys())
             for host_id, tags in results.items():
+                print("response tags: ", response_data["results"][host_id])
                 assert len(tags) == len(response_data["results"][host_id])
 
 

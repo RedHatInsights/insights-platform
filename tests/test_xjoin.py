@@ -251,6 +251,7 @@ def test_query_variables_priority(filter_, query, mocker, query_source_xjoin, gr
             quote("a/a=a") + "/" + quote("b/b=b") + "=" + quote("c/c=c"),
         ),
         (({"namespace": {"eq": "ɑ"}, "key": {"eq": "β"}, "value": {"eq": "ɣ"}},), "ɑ/β=ɣ"),
+        (({"namespace": {"eq": "namespace"}, "key": {"eq": "b"}, "value": {"eq": "c"}},), "NAMESpace/b=c"),
     ),
 )
 def test_query_variables_tags(tags, query_param, mocker, query_source_xjoin, graphql_query_empty_response, api_get):
@@ -260,6 +261,30 @@ def test_query_variables_tags(tags, query_param, mocker, query_source_xjoin, gra
     assert response_status == 200
 
     tag_filters = tuple({"tag": item} for item in tags)
+
+    graphql_query_empty_response.assert_called_once_with(
+        HOST_QUERY,
+        {
+            "order_by": mocker.ANY,
+            "order_how": mocker.ANY,
+            "limit": mocker.ANY,
+            "offset": mocker.ANY,
+            "filter": tag_filters + (mocker.ANY,),
+        },
+        mocker.ANY,
+    )
+
+
+def test_query_variables_tags_namespace_always_lowercase(
+    mocker, query_source_xjoin, graphql_query_empty_response, api_get
+):
+    query_param = "SaTEllITE/key5=val5"
+    url = build_hosts_url(query=f"?tags={quote(query_param)}")
+    response_status, response_data = api_get(url)
+
+    assert response_status == 200
+
+    tag_filters = ({"tag": {"namespace": {"eq": "satellite"}, "key": {"eq": "key5"}, "value": {"eq": "val5"}}},)
 
     graphql_query_empty_response.assert_called_once_with(
         HOST_QUERY,
@@ -844,7 +869,7 @@ def test_query_variables_tags_collection_multi(mocker, query_source_xjoin, graph
             "offset": 0,
             "hostFilter": {
                 "AND": (
-                    {"tag": {"namespace": {"eq": "Sat"}, "key": {"eq": "env"}, "value": {"eq": "prod"}}},
+                    {"tag": {"namespace": {"eq": "sat"}, "key": {"eq": "env"}, "value": {"eq": "prod"}}},
                     {"tag": {"namespace": {"eq": "insights-client"}, "key": {"eq": "os"}, "value": {"eq": "fedora"}}},
                 ),
                 "OR": mocker.ANY,
@@ -869,7 +894,7 @@ def test_query_variables_tags_collection_csv(mocker, query_source_xjoin, graphql
             "offset": 0,
             "hostFilter": {
                 "AND": (
-                    {"tag": {"namespace": {"eq": "Sat"}, "key": {"eq": "env"}, "value": {"eq": "prod"}}},
+                    {"tag": {"namespace": {"eq": "sat"}, "key": {"eq": "env"}, "value": {"eq": "prod"}}},
                     {"tag": {"namespace": {"eq": "insights-client"}, "key": {"eq": "os"}, "value": {"eq": "fedora"}}},
                 ),
                 "OR": mocker.ANY,
@@ -915,7 +940,7 @@ def test_query_variables_tags_without_value(mocker, query_source_xjoin, graphql_
             "limit": 50,
             "offset": 0,
             "hostFilter": {
-                "AND": ({"tag": {"namespace": {"eq": "Sat"}, "key": {"eq": "env"}, "value": {"eq": None}}},),
+                "AND": ({"tag": {"namespace": {"eq": "sat"}, "key": {"eq": "env"}, "value": {"eq": None}}},),
                 "OR": mocker.ANY,
             },
         },

@@ -36,7 +36,7 @@ logger = get_logger(__name__)
 
 db = SQLAlchemy()
 
-TAG_NAMESPACE_VALIDATION = marshmallow_validate.Length(max=255)
+TAG_NAMESPACE_VALIDATION = marshmallow_validate.OneOf(["insights-client", "satellite"])
 TAG_KEY_VALIDATION = marshmallow_validate.Length(min=1, max=255)
 TAG_VALUE_VALIDATION = marshmallow_validate.Length(max=255)
 
@@ -436,6 +436,15 @@ class TagsSchema(MarshmallowSchema):
     namespace = fields.Str(required=False, allow_none=True, validate=TAG_NAMESPACE_VALIDATION)
     key = fields.Str(required=True, allow_none=False, validate=TAG_KEY_VALIDATION)
     value = fields.Str(required=False, allow_none=True, validate=TAG_VALUE_VALIDATION)
+
+    @pre_load
+    def lowercase_namespace(self, in_data, **kwargs):
+        if isinstance(in_data, dict) and isinstance(in_data.get("namespace"), str):
+            in_data["namespace"] = in_data["namespace"].lower()
+        else:
+            raise MarshmallowValidationError("tags in wrong format")
+        print(in_data)
+        return in_data
 
 
 class CanonicalFactsSchema(MarshmallowSchema):

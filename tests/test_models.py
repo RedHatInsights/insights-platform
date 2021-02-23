@@ -9,6 +9,7 @@ from app import db
 from app.models import Host
 from app.models import HttpHostSchema
 from app.models import MqHostSchema
+from app.serialization import deserialize_host_mq
 from app.utils import Tag
 from tests.helpers.test_utils import generate_uuid
 from tests.helpers.test_utils import now
@@ -128,8 +129,11 @@ def test_create_host_with_system_profile(db_create_host):
 @pytest.mark.parametrize(
     "tags",
     [
-        [{"namespace": "Sat", "key": "env", "value": "prod"}, {"namespace": "AWS", "key": "env", "value": "ci"}],
-        [{"namespace": "Sat", "key": "env"}, {"namespace": "AWS", "key": "env"}],
+        [
+            {"namespace": "satellite", "key": "env", "value": "prod"},
+            {"namespace": "insights-client", "key": "env", "value": "ci"},
+        ],
+        [{"namespace": "satellite", "key": "env"}, {"namespace": "insights-client", "key": "env"}],
     ],
 )
 def test_host_schema_valid_tags(tags):
@@ -161,7 +165,7 @@ def test_host_schema_ignored_tags(tags):
     assert "tags" not in validated_host.data
 
 
-@pytest.mark.parametrize("tags", [[{"namespace": "Sat/"}], [{"value": "bad_tag"}]])
+@pytest.mark.parametrize("tags", [[{"namespace": "satellite"}], [{"value": "bad_tag"}]])
 def test_host_schema_invalid_tags(tags):
     host = {
         "fqdn": "fred.flintstone.com",
@@ -176,7 +180,6 @@ def test_host_schema_invalid_tags(tags):
 
     error_messages = exception.value.normalized_messages()
     assert "tags" in error_messages
-    assert error_messages["tags"] == {0: {"key": ["Missing data for required field."]}}
 
 
 @pytest.mark.parametrize("schema", [MqHostSchema, HttpHostSchema])
@@ -197,8 +200,11 @@ def test_host_schema_timezone_enforced(schema):
 @pytest.mark.parametrize(
     "tags",
     [
-        [{"namespace": "Sat", "key": "env", "value": "prod"}, {"namespace": "AWS", "key": "env", "value": "ci"}],
-        [{"namespace": "Sat", "key": "env"}, {"namespace": "AWS", "key": "env"}],
+        [
+            {"namespace": "satellite", "key": "env", "value": "prod"},
+            {"namespace": "insights-client", "key": "env", "value": "ci"},
+        ],
+        [{"namespace": "satellitez", "key": "env"}, {"namespace": "insights-client", "key": "env"}],
     ],
 )
 def test_create_host_with_tags(tags, db_create_host):
@@ -249,7 +255,7 @@ def test_host_model_assigned_values(db_create_host, db_get_host):
         "display_name": "display_name",
         "ansible_host": "ansible_host",
         "facts": [{"namespace": "namespace", "facts": {"key": "value"}}],
-        "tags": {"namespace": {"key": ["value"]}},
+        "tags": {"satellite": {"key": ["value"]}},
         "canonical_facts": {"fqdn": "fqdn"},
         "system_profile_facts": {"number_of_cpus": 1},
         "stale_timestamp": now(),
@@ -329,3 +335,30 @@ def test_host_model_constraints(field, value, db_create_host):
 
     with pytest.raises(DataError):
         db_create_host(host)
+
+
+def test_host_schema_tags_always_lowercase():
+    tags = [
+        {"namespace": "SatEllIte", "key": "env", "value": "prod"},
+        {"namespace": "INsIghTs-ClIenT", "key": "ALLCAPS", "value": "MixEd_CapS"},
+    ]
+    tags_lowercase_namespaces = {"satellite": {"env": ["prod"]}, "insights-client": {"ALLCAPS": ["MixEd_CapS"]}}
+
+    host = {
+        "fqdn": "fred.flintstone.com",
+        "display_name": "display_name",
+        "account": USER_IDENTITY["account_number"],
+        "tags": tags,
+        "stale_timestamp": now().isoformat(),
+        "reporter": "test",
+        "system_profile": {
+            "owner_id": "1b36b20f-7fa0-4454-a6d2-008294e06378",
+            "number_of_cpus": 1,
+            "number_of_sockets": 2,
+            "cores_per_socket": 4,
+        },
+        "subscription_manager_id": "044e36dc-4e2b-4e69-8948-9c65a7bf4976",
+    }
+
+    deserialized_host = deserialize_host_mq(host)
+    assert deserialized_host.tags == tags_lowercase_namespaces
