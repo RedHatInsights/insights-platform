@@ -1938,11 +1938,14 @@
               "$ref": "#/components/schemas/SystemProfileNestedObject"
             },
             {
-              "not": {
-                "type": "object"
-              }
+              "$ref": "#/components/schemas/SystemProfileNonObject"
             }
           ]
+        }
+      },
+      "SystemProfileNonObject": {
+        "not": {
+          "type": "object"
         }
       },
       "SystemProfileDiskDevice": {

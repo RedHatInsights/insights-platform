@@ -12,8 +12,10 @@ $defs:
     additionalProperties:
       oneOf:
         - "$ref": "#/$defs/NestedObject"
-        - not:
-            type: object
+        - "$ref": "#/$defs/NonObject"
+  NonObject:
+    not:
+      type: object
   DiskDevice:
     description: Representation of one mounted device
     type: object
