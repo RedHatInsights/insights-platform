@@ -10,6 +10,7 @@ RUN dnf install -y postgresql
 USER 1001
 
 WORKDIR /opt/app-root/src
+
 COPY . .
 
 RUN pip install --upgrade pip && \
