@@ -966,8 +966,7 @@
         "style": "deepObject",
         "explode": true,
         "schema": {
-          "type": "object",
-          "description": "System profile field values to filter with"
+          "$ref": "#/components/schemas/SystemProfileNestedObject"
         }
       },
       "fields_param": {
@@ -978,8 +977,7 @@
         "style": "deepObject",
         "explode": true,
         "schema": {
-          "type": "object",
-          "description": "System profile field values to fetch"
+          "$ref": "#/components/schemas/SystemProfileNestedObject"
         }
       }
     },
