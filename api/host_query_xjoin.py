@@ -321,6 +321,8 @@ def _query_filters(
     if filter:
         if filter.get("system_profile"):
             query_filters += _build_system_profile_filter(filter["system_profile"])
+        if filter.get("per_reporter_staleness"):
+            query_filters += _build_per_reporter_staleness_filter(filter["per_reporter_staleness"])
 
     logger.debug(query_filters)
     return query_filters
@@ -357,6 +359,27 @@ def _build_system_profile_filter(system_profile):
         system_profile_filter += build_filter_string_multiple("spf_host_type", system_profile["host_type"], "eq")
 
     return system_profile_filter
+
+
+def _build_per_reporter_staleness_filter(per_reporter_staleness):
+    prs_dict_array = []
+
+    for reporter, props in per_reporter_staleness.items():
+        if isinstance(props.get("exists"), str) and props.get("exists").lower() == "false":
+            prs_dict_array.append({"NOT": {"per_reporter_staleness": {"reporter": {"eq": reporter}}}})
+        else:
+            prs_dict = {"reporter": {"eq": reporter}}
+
+            if props.get("stale_timestamp"):
+                prs_dict["stale_timestamp"] = props["stale_timestamp"]
+            if props.get("last_check_in"):
+                prs_dict["last_check_in"] = props["last_check_in"]
+            if props.get("check_in_succeeded"):
+                prs_dict.update(_boolean_filter("check_in_succeeded", props["check_in_succeeded"])[0])
+
+            prs_dict_array.append({"per_reporter_staleness": prs_dict})
+
+    return ({"AND": prs_dict_array},)
 
 
 def owner_id_filter():
