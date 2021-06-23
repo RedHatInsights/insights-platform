@@ -1070,8 +1070,6 @@ components:
       $ref: 'system_profile.spec.yaml#/$defs/SystemProfile'
     SystemProfileNestedObject:
       $ref: 'system_profile.spec.yaml#/$defs/NestedObject'
-    SystemProfileNonObject:
-      $ref: 'system_profile.spec.yaml#/$defs/NonObject'
     SystemProfileDiskDevice:
       $ref: 'system_profile.spec.yaml#/$defs/DiskDevice'
     SystemProfileYumRepo:
