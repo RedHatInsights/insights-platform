@@ -244,10 +244,10 @@ $defs:
         maxLength: 50
         x-indexed: false
       cpu_flags:
+        type: array
         items:
           type: string
           maxLength: 30
-        type: array
       operating_system:
         description: Object for OS details. Supports range operations
         type: object
