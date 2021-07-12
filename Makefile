@@ -37,3 +37,12 @@ style:
 
 validate-dashboard:
 	python utils/validate_dashboards.py
+
+
+update_schema:
+	git submodule update --remote -- swagger/inventory-schemas
+	cp \
+	    swagger/inventory-schemas/schemas/system_profile/v1.yaml \
+	    swagger/system_profile.spec.yaml
+	git add swagger
+	git diff --cached

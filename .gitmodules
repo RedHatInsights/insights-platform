@@ -1,0 +1,3 @@
+[submodule "swagger/inventory-schemas"]
+	path = swagger/inventory-schemas
+	url = git@github.com:RedHatInsights/inventory-schemas.git
